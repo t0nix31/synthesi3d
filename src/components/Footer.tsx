@@ -1,25 +1,12 @@
 import type { SVGProps } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  Facebook,
-  Globe,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
-  Phone,
-} from "lucide-react";
+import { Facebook, Globe, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 
 import { Logo } from "@/components/Logo";
 
 function TikTokIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.3 0 .6.05.88.15V9.4a6.35 6.35 0 0 0-.88-.06A6.33 6.33 0 0 0 5 20.12a6.34 6.34 0 0 0 10.86-4.45V8.75a8.2 8.2 0 0 0 4.77 1.52V6.85c-.35 0-.69-.06-1.04-.16Z" />
     </svg>
   );
@@ -48,25 +35,25 @@ const socialLinks = [
   },
 ].filter((social) => social.href);
 
+const legalLinkClass = "text-muted-foreground transition-smooth hover:text-primary";
+
 export function Footer() {
   return (
     <footer className="relative mt-32 border-t border-border/60 bg-surface/40">
-      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-4 lg:px-10">
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-5 lg:px-10">
         <div className="md:col-span-2">
           <Logo className="h-20 w-auto" />
 
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Stampa 3D, scansioni 3D, reverse engineering e progettazione CAD per
-            Aerospace, Motorsport e Ferroviario High-Speed. Vent&apos;anni di
-            ingegneria, oggi accessibili.
+            Stampa 3D, scansioni 3D, reverse engineering e progettazione CAD per Aerospace,
+            Motorsport e Ferroviario High-Speed. Vent&apos;anni di ingegneria, oggi accessibili.
           </p>
 
           <div className="mt-7">
             <p className="tech-label mb-2">Guarda i nostri lavori</p>
 
             <p className="mb-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Seguici sui social per vedere prototipi, stampe 3D, scansioni e
-              progetti realizzati.
+              Seguici sui social per vedere prototipi, stampe 3D, scansioni e progetti realizzati.
             </p>
 
             <div className="flex items-center gap-3">
@@ -92,39 +79,68 @@ export function Footer() {
 
           <ul className="space-y-3 text-sm">
             <li>
-              <Link
-                to="/"
-                className="text-muted-foreground transition-smooth hover:text-primary"
-              >
+              <Link to="/" className={legalLinkClass}>
                 Home
               </Link>
             </li>
 
             <li>
-              <Link
-                to="/servizi"
-                className="text-muted-foreground transition-smooth hover:text-primary"
-              >
+              <Link to="/servizi" className={legalLinkClass}>
                 Servizi
               </Link>
             </li>
 
             <li>
-              <Link
-                to="/chi-siamo"
-                className="text-muted-foreground transition-smooth hover:text-primary"
-              >
+              <Link to="/chi-siamo" className={legalLinkClass}>
                 Chi Siamo
               </Link>
             </li>
 
             <li>
-              <Link
-                to="/contatti"
-                className="text-muted-foreground transition-smooth hover:text-primary"
-              >
+              <Link to="/contatti" className={legalLinkClass}>
                 Contatti
               </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="tech-label mb-5">Legale</p>
+
+          <ul className="space-y-3 text-sm">
+            <li>
+              <a
+                href="https://www.iubenda.com/privacy-policy/82947247"
+                className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
+                title="Privacy Policy"
+              >
+                Privacy Policy
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="https://www.iubenda.com/privacy-policy/82947247/cookie-policy"
+                className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
+                title="Cookie Policy"
+              >
+                Cookie Policy
+              </a>
+            </li>
+
+            <li>
+              <Link to="/privacy-contatti" className={legalLinkClass}>
+                Informativa contatti
+              </Link>
+            </li>
+
+            <li>
+              <button
+                type="button"
+                className={`iubenda-cs-preferences-link cursor-pointer bg-transparent p-0 text-left ${legalLinkClass}`}
+              >
+                Preferenze cookie
+              </button>
             </li>
           </ul>
         </div>
@@ -135,30 +151,21 @@ export function Footer() {
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <Mail className="mt-0.5 h-4 w-4 text-primary" />
-              <a
-                href="mailto:info@sintesi3d.it"
-                className="transition-smooth hover:text-primary"
-              >
+              <a href="mailto:info@sintesi3d.it" className="transition-smooth hover:text-primary">
                 info@sintesi3d.it
               </a>
             </li>
 
             <li className="flex items-start gap-2">
               <Phone className="mt-0.5 h-4 w-4 text-primary" />
-              <a
-                href="tel:+393755905212"
-                className="transition-smooth hover:text-primary"
-              >
+              <a href="tel:+393755905212" className="transition-smooth hover:text-primary">
                 +39 375 590 5212
               </a>
             </li>
 
             <li className="flex items-start gap-2">
               <Globe className="mt-0.5 h-4 w-4 text-primary" />
-              <a
-                href="https://www.sintesi3d.it"
-                className="transition-smooth hover:text-primary"
-              >
+              <a href="https://www.sintesi3d.it" className="transition-smooth hover:text-primary">
                 www.sintesi3d.it
               </a>
             </li>
@@ -173,9 +180,7 @@ export function Footer() {
 
       <div className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground md:flex-row lg:px-10">
-          <span>
-            © {new Date().getFullYear()} Sintesi 3D — All rights reserved
-          </span>
+          <span>© {new Date().getFullYear()} Sintesi 3D — All rights reserved</span>
 
           <span className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
