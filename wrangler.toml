@@ -12,3 +12,4 @@ bucket_name = "synthesi3d-contatti"
 
 [observability]
 enabled = true
+
