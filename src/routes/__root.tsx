@@ -30,14 +30,22 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Sintesi 3D | Stampa 3D, scansione 3D e progettazione CAD" },
+      {
+        name: "description",
+        content:
+          "Sintesi 3D offre servizi di stampa 3D, scansione 3D, reverse engineering e progettazione CAD per aziende, professionisti e privati.",
+      },
+      { name: "author", content: "Sintesi 3D" },
+      { property: "og:title", content: "Sintesi 3D" },
+      {
+        property: "og:description",
+        content:
+          "Stampa 3D, scansione 3D, reverse engineering e progettazione CAD professionale.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Sintesi 3D" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -51,7 +59,7 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="it">
       <head>
         <HeadContent />
       </head>

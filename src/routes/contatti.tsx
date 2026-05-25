@@ -379,10 +379,10 @@ function ContactPage() {
                   >
                     informativa sul trattamento dei dati inviati tramite il modulo contatti
                   </a>
-                  . Autorizzo il trattamento dei dati inseriti e degli allegati
-                  esclusivamente per essere ricontattato in merito alla mia richiesta.
-                  Gli allegati saranno accessibili tramite link temporaneo e conservati
-                  per massimo 30 giorni.
+                  . Sono consapevole che i dati inseriti e gli eventuali allegati saranno
+                  trattati esclusivamente per gestire la mia richiesta, predisporre un
+                  riscontro tecnico o commerciale e ricontattarmi. Gli allegati saranno
+                  accessibili tramite link temporaneo e conservati per massimo 30 giorni.
                 </span>
               </label>
 
