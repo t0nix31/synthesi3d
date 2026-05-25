@@ -1,5 +1,5 @@
 import type { SVGProps } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Facebook, Globe, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 
 import { Logo } from "@/components/Logo";
@@ -38,6 +38,23 @@ const socialLinks = [
 const legalLinkClass = "text-muted-foreground transition-smooth hover:text-primary";
 
 export function Footer() {
+  const location = useLocation();
+  const isEnglish = location.pathname.startsWith("/en");
+
+  const navLinks = isEnglish
+    ? [
+        { to: "/en/", label: "Home" },
+        { to: "/en/services", label: "Services" },
+        { to: "/en/about", label: "About" },
+        { to: "/en/contact", label: "Contact" },
+      ] as const
+    : [
+        { to: "/", label: "Home" },
+        { to: "/servizi", label: "Servizi" },
+        { to: "/chi-siamo", label: "Chi Siamo" },
+        { to: "/contatti", label: "Contatti" },
+      ] as const;
+
   return (
     <footer className="relative mt-32 border-t border-border/60 bg-surface/40">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-5 lg:px-10">
@@ -45,15 +62,20 @@ export function Footer() {
           <Logo className="h-20 w-auto" />
 
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Stampa 3D, scansioni 3D, reverse engineering e progettazione CAD per Aerospace,
-            Motorsport e Ferroviario High-Speed. Vent&apos;anni di ingegneria, oggi accessibili.
+            {isEnglish
+              ? "3D printing, 3D scanning, reverse engineering and CAD design for aerospace, motorsport and high-speed rail applications. Twenty years of engineering know-how, now accessible."
+              : "Stampa 3D, scansioni 3D, reverse engineering e progettazione CAD per Aerospace, Motorsport e Ferroviario High-Speed. Vent'anni di ingegneria, oggi accessibili."}
           </p>
 
           <div className="mt-7">
-            <p className="tech-label mb-2">Guarda i nostri lavori</p>
+            <p className="tech-label mb-2">
+              {isEnglish ? "See our work" : "Guarda i nostri lavori"}
+            </p>
 
             <p className="mb-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Seguici sui social per vedere prototipi, stampe 3D, scansioni e progetti realizzati.
+              {isEnglish
+                ? "Follow us on social media to see prototypes, 3D prints, scans and completed projects."
+                : "Seguici sui social per vedere prototipi, stampe 3D, scansioni e progetti realizzati."}
             </p>
 
             <div className="flex items-center gap-3">
@@ -75,62 +97,58 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="tech-label mb-5">Navigazione</p>
+          <p className="tech-label mb-5">{isEnglish ? "Navigation" : "Navigazione"}</p>
 
           <ul className="space-y-3 text-sm">
-            <li>
-              <Link to="/" className={legalLinkClass}>
-                Home
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/servizi" className={legalLinkClass}>
-                Servizi
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/chi-siamo" className={legalLinkClass}>
-                Chi Siamo
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/contatti" className={legalLinkClass}>
-                Contatti
-              </Link>
-            </li>
+            {navLinks.map((link) => (
+              <li key={link.to}>
+                <Link to={link.to} className={legalLinkClass}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
         <div>
-          <p className="tech-label mb-5">Legale</p>
+          <p className="tech-label mb-5">{isEnglish ? "Legal" : "Legale"}</p>
 
           <ul className="space-y-3 text-sm">
             <li>
-              <a
-                href="https://www.iubenda.com/privacy-policy/82947247"
-                className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
-                title="Privacy Policy"
-              >
-                Privacy Policy
-              </a>
+              {isEnglish ? (
+                <Link to="/en/privacy" className={legalLinkClass}>
+                  Privacy Notice
+                </Link>
+              ) : (
+                <a
+                  href="https://www.iubenda.com/privacy-policy/82947247"
+                  className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
+                  title="Privacy Policy"
+                >
+                  Privacy Policy
+                </a>
+              )}
             </li>
 
             <li>
-              <a
-                href="https://www.iubenda.com/privacy-policy/82947247/cookie-policy"
-                className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
-                title="Cookie Policy"
-              >
-                Cookie Policy
-              </a>
+              {isEnglish ? (
+                <Link to="/en/cookie-policy" className={legalLinkClass}>
+                  Cookie Notice
+                </Link>
+              ) : (
+                <a
+                  href="https://www.iubenda.com/privacy-policy/82947247/cookie-policy"
+                  className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
+                  title="Cookie Policy"
+                >
+                  Cookie Policy
+                </a>
+              )}
             </li>
 
             <li>
-              <Link to="/privacy-contatti" className={legalLinkClass}>
-                Informativa contatti
+              <Link to={isEnglish ? "/en/contact-privacy" : "/privacy-contatti"} className={legalLinkClass}>
+                {isEnglish ? "Contact form privacy notice" : "Informativa contatti"}
               </Link>
             </li>
 
@@ -139,14 +157,14 @@ export function Footer() {
                 type="button"
                 className={`iubenda-cs-preferences-link cursor-pointer bg-transparent p-0 text-left ${legalLinkClass}`}
               >
-                Preferenze cookie
+                {isEnglish ? "Cookie preferences" : "Preferenze cookie"}
               </button>
             </li>
           </ul>
         </div>
 
         <div>
-          <p className="tech-label mb-5">Contatti</p>
+          <p className="tech-label mb-5">{isEnglish ? "Contact" : "Contatti"}</p>
 
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
@@ -184,7 +202,7 @@ export function Footer() {
 
           <span className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-            System operational
+            {isEnglish ? "System operational" : "Sistema operativo"}
           </span>
         </div>
       </div>
