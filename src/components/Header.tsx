@@ -71,17 +71,17 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 lg:px-8 xl:px-10">
+      <div className="mx-auto flex max-w-[1800px] items-center justify-between px-4 py-3 sm:px-6 sm:py-4 lg:px-8 2xl:px-10">
         <Link
           to={homeLink}
           className="group flex min-w-0 items-center"
           onClick={() => setOpen(false)}
           aria-label={isEnglish ? "Sintesi 3D — Home" : "Sintesi 3D — Home"}
         >
-          <Logo className="h-9 w-auto transition-smooth group-hover:drop-shadow-[0_0_12px_oklch(0.82_0.16_195/0.55)] sm:h-12 md:h-14 xl:h-16" />
+          <Logo className="h-9 w-auto transition-smooth group-hover:drop-shadow-[0_0_12px_oklch(0.82_0.16_195/0.55)] sm:h-12 md:h-14 2xl:h-16" />
         </Link>
 
-        <nav className="hidden items-center gap-8 xl:flex 2xl:gap-10">
+        <nav className="hidden items-center gap-7 2xl:flex 2xl:gap-9">
           {links.map((l) => (
             <Link
               key={l.to}
@@ -95,7 +95,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 xl:flex">
+        <div className="hidden items-center gap-3 2xl:flex">
           <a
             href={languageSwitch.href}
             aria-label={languageSwitch.ariaLabel}
@@ -114,7 +114,7 @@ export function Header() {
           </Link>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 xl:hidden">
+        <div className="flex shrink-0 items-center gap-2 2xl:hidden">
           <a
             href={languageSwitch.href}
             aria-label={languageSwitch.ariaLabel}
@@ -136,7 +136,7 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-border/60 bg-background/95 backdrop-blur-xl xl:hidden">
+        <div className="border-t border-border/60 bg-background/95 backdrop-blur-xl 2xl:hidden">
           <nav className="flex flex-col px-6 py-4">
             {links.map((l) => (
               <Link
