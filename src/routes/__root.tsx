@@ -10,7 +10,7 @@ function NotFoundComponent() {
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <div className="mt-6">
           <Link
@@ -49,6 +49,9 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "alternate", hrefLang: "it", href: "https://www.sintesi3d.it/" },
+      { rel: "alternate", hrefLang: "en", href: "https://www.sintesi3d.it/en/" },
+      { rel: "alternate", hrefLang: "x-default", href: "https://www.sintesi3d.it/" },
       // Font serviti localmente da /public/font/ — nessuna richiesta a Google (GDPR)
     ],
   }),
@@ -59,8 +62,14 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it">
+    <html lang="it" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "document.documentElement.lang = location.pathname.startsWith('/en') ? 'en' : 'it';",
+          }}
+        />
         <HeadContent />
       </head>
       <body>
