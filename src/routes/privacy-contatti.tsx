@@ -265,25 +265,45 @@ function PrivacyContattiPage() {
             </p>
           </Block>
 
-          <Block title="11. Trasferimenti extra UE">
+          <Block title="11. Trasferimenti di dati fuori dallo SEE">
             <p>
-              Alcuni fornitori tecnici utilizzati per l’erogazione del sito e dei
-              servizi collegati, in particolare Cloudflare e Resend, possono trattare
-              dati anche al di fuori dello Spazio Economico Europeo, inclusi gli Stati
-              Uniti, secondo le rispettive condizioni contrattuali e informative
-              privacy.
+              Per l’erogazione del sito, la gestione del modulo contatti, l’invio delle
+              email e l’archiviazione temporanea degli allegati, Sintesi 3D utilizza
+              fornitori tecnici che possono trattare dati personali anche al di fuori
+              dello Spazio Economico Europeo, inclusi gli Stati Uniti.
             </p>
 
             <p className="mt-3">
-              Quando necessario, tali trasferimenti avvengono sulla base di strumenti
-              di garanzia previsti dalla normativa applicabile, come Data Processing
-              Agreement, Standard Contractual Clauses o altri meccanismi di trasferimento
-              riconosciuti dalla normativa privacy vigente.
+              In particolare, <strong className="text-foreground">Cloudflare</strong>
+              può trattare dati tecnici, log, dati di richiesta e allegati tecnici
+              tramite i servizi Workers, R2, sicurezza, rete e monitoraggio tecnico.
+              <strong className="text-foreground"> Resend</strong> può trattare i dati
+              necessari all’invio delle email generate dal modulo contatti, inclusi
+              nome, indirizzo email, contenuto della richiesta, metadati tecnici e link
+              temporanei agli allegati.
+            </p>
+
+            <p className="mt-3">
+              I trasferimenti verso paesi extra SEE avvengono, ove necessario, sulla
+              base di garanzie adeguate previste dalla normativa applicabile, tra cui
+              Data Processing Agreement, Standard Contractual Clauses approvate dalla
+              Commissione Europea, eventuali decisioni di adeguatezza applicabili e/o
+              ulteriori misure contrattuali e tecniche adottate dai fornitori.
+            </p>
+
+            <p className="mt-3">
+              Cloudflare mette a disposizione un Data Processing Addendum e Standard
+              Contractual Clauses per i trasferimenti internazionali. Resend dichiara
+              nel proprio Data Processing Addendum che le principali attività di
+              trattamento possono avvenire negli Stati Uniti e che, per i trasferimenti
+              extra SEE, utilizza le Standard Contractual Clauses e altri meccanismi
+              previsti dalla normativa applicabile.
             </p>
 
             <p className="mt-3">
               Per maggiori dettagli sui servizi generali del sito, consulta anche la
-              Privacy Policy completa generata tramite iubenda.
+              Privacy Policy completa generata tramite iubenda e le informative privacy
+              dei rispettivi fornitori.
             </p>
           </Block>
 
