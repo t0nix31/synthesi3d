@@ -1,5 +1,4 @@
 /* eslint-disable */
-
 // @ts-nocheck
 
 // noinspection JSUnusedGlobalSymbols
@@ -14,11 +13,17 @@ import { Route as ProgettiRouteImport } from './routes/progetti'
 import { Route as PrivacyContattiRouteImport } from './routes/privacy-contatti'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as EnIndexRouteImport } from './routes/en/index'
+import { Route as EnServicesRouteImport } from './routes/en/services'
+import { Route as EnProjectsRouteImport } from './routes/en/projects'
+import { Route as EnAboutRouteImport } from './routes/en/about'
+import { Route as EnContactRouteImport } from './routes/en/contact'
+import { Route as EnContactPrivacyRouteImport } from './routes/en/contact-privacy'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
 import { Route as EnCookiePolicyRouteImport } from './routes/en/cookie-policy'
 import { Route as ApiDownloadRouteImport } from './routes/api/download'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
+import { Route as IndexRouteImport } from './routes/index'
 
 const ServiziRoute = ServiziRouteImport.update({
   id: '/servizi',
@@ -45,9 +50,34 @@ const ChiSiamoRoute = ChiSiamoRouteImport.update({
   path: '/chi-siamo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const EnIndexRoute = EnIndexRouteImport.update({
+  id: '/en/',
+  path: '/en/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnServicesRoute = EnServicesRouteImport.update({
+  id: '/en/services',
+  path: '/en/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnProjectsRoute = EnProjectsRouteImport.update({
+  id: '/en/projects',
+  path: '/en/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnAboutRoute = EnAboutRouteImport.update({
+  id: '/en/about',
+  path: '/en/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnContactRoute = EnContactRouteImport.update({
+  id: '/en/contact',
+  path: '/en/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnContactPrivacyRoute = EnContactPrivacyRouteImport.update({
+  id: '/en/contact-privacy',
+  path: '/en/contact-privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnPrivacyRoute = EnPrivacyRouteImport.update({
@@ -70,94 +100,141 @@ const ApiContactRoute = ApiContactRouteImport.update({
   path: '/api/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/api/contact': typeof ApiContactRoute
-  '/api/download': typeof ApiDownloadRoute
-  '/chi-siamo': typeof ChiSiamoRoute
-  '/contatti': typeof ContattiRoute
-  '/en/cookie-policy': typeof EnCookiePolicyRoute
-  '/en/privacy': typeof EnPrivacyRoute
-  '/privacy-contatti': typeof PrivacyContattiRoute
-  '/progetti': typeof ProgettiRoute
   '/servizi': typeof ServiziRoute
+  '/progetti': typeof ProgettiRoute
+  '/privacy-contatti': typeof PrivacyContattiRoute
+  '/contatti': typeof ContattiRoute
+  '/chi-siamo': typeof ChiSiamoRoute
+  '/en/': typeof EnIndexRoute
+  '/en/services': typeof EnServicesRoute
+  '/en/projects': typeof EnProjectsRoute
+  '/en/about': typeof EnAboutRoute
+  '/en/contact': typeof EnContactRoute
+  '/en/contact-privacy': typeof EnContactPrivacyRoute
+  '/en/privacy': typeof EnPrivacyRoute
+  '/en/cookie-policy': typeof EnCookiePolicyRoute
+  '/api/download': typeof ApiDownloadRoute
+  '/api/contact': typeof ApiContactRoute
+  '/': typeof IndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/api/contact': typeof ApiContactRoute
-  '/api/download': typeof ApiDownloadRoute
-  '/chi-siamo': typeof ChiSiamoRoute
-  '/contatti': typeof ContattiRoute
-  '/en/cookie-policy': typeof EnCookiePolicyRoute
-  '/en/privacy': typeof EnPrivacyRoute
-  '/privacy-contatti': typeof PrivacyContattiRoute
-  '/progetti': typeof ProgettiRoute
   '/servizi': typeof ServiziRoute
+  '/progetti': typeof ProgettiRoute
+  '/privacy-contatti': typeof PrivacyContattiRoute
+  '/contatti': typeof ContattiRoute
+  '/chi-siamo': typeof ChiSiamoRoute
+  '/en/': typeof EnIndexRoute
+  '/en/services': typeof EnServicesRoute
+  '/en/projects': typeof EnProjectsRoute
+  '/en/about': typeof EnAboutRoute
+  '/en/contact': typeof EnContactRoute
+  '/en/contact-privacy': typeof EnContactPrivacyRoute
+  '/en/privacy': typeof EnPrivacyRoute
+  '/en/cookie-policy': typeof EnCookiePolicyRoute
+  '/api/download': typeof ApiDownloadRoute
+  '/api/contact': typeof ApiContactRoute
+  '/': typeof IndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/api/contact': typeof ApiContactRoute
-  '/api/download': typeof ApiDownloadRoute
-  '/chi-siamo': typeof ChiSiamoRoute
-  '/contatti': typeof ContattiRoute
-  '/en/cookie-policy': typeof EnCookiePolicyRoute
-  '/en/privacy': typeof EnPrivacyRoute
-  '/privacy-contatti': typeof PrivacyContattiRoute
-  '/progetti': typeof ProgettiRoute
   '/servizi': typeof ServiziRoute
+  '/progetti': typeof ProgettiRoute
+  '/privacy-contatti': typeof PrivacyContattiRoute
+  '/contatti': typeof ContattiRoute
+  '/chi-siamo': typeof ChiSiamoRoute
+  '/en/': typeof EnIndexRoute
+  '/en/services': typeof EnServicesRoute
+  '/en/projects': typeof EnProjectsRoute
+  '/en/about': typeof EnAboutRoute
+  '/en/contact': typeof EnContactRoute
+  '/en/contact-privacy': typeof EnContactPrivacyRoute
+  '/en/privacy': typeof EnPrivacyRoute
+  '/en/cookie-policy': typeof EnCookiePolicyRoute
+  '/api/download': typeof ApiDownloadRoute
+  '/api/contact': typeof ApiContactRoute
+  '/': typeof IndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/api/contact'
-    | '/api/download'
-    | '/chi-siamo'
-    | '/contatti'
-    | '/en/cookie-policy'
-    | '/en/privacy'
-    | '/privacy-contatti'
-    | '/progetti'
     | '/servizi'
-  fileRoutesByTo: FileRoutesByTo
+    | '/progetti'
+    | '/privacy-contatti'
+    | '/contatti'
+    | '/chi-siamo'
+    | '/en/'
+    | '/en/services'
+    | '/en/projects'
+    | '/en/about'
+    | '/en/contact'
+    | '/en/contact-privacy'
+    | '/en/privacy'
+    | '/en/cookie-policy'
+    | '/api/download'
+    | '/api/contact'
+    | '/'
   to:
-    | '/'
-    | '/api/contact'
-    | '/api/download'
-    | '/chi-siamo'
-    | '/contatti'
-    | '/en/cookie-policy'
-    | '/en/privacy'
-    | '/privacy-contatti'
-    | '/progetti'
     | '/servizi'
+    | '/progetti'
+    | '/privacy-contatti'
+    | '/contatti'
+    | '/chi-siamo'
+    | '/en/'
+    | '/en/services'
+    | '/en/projects'
+    | '/en/about'
+    | '/en/contact'
+    | '/en/contact-privacy'
+    | '/en/privacy'
+    | '/en/cookie-policy'
+    | '/api/download'
+    | '/api/contact'
+    | '/'
   id:
     | '__root__'
-    | '/'
-    | '/api/contact'
-    | '/api/download'
-    | '/chi-siamo'
-    | '/contatti'
-    | '/en/cookie-policy'
-    | '/en/privacy'
-    | '/privacy-contatti'
-    | '/progetti'
     | '/servizi'
+    | '/progetti'
+    | '/privacy-contatti'
+    | '/contatti'
+    | '/chi-siamo'
+    | '/en/'
+    | '/en/services'
+    | '/en/projects'
+    | '/en/about'
+    | '/en/contact'
+    | '/en/contact-privacy'
+    | '/en/privacy'
+    | '/en/cookie-policy'
+    | '/api/download'
+    | '/api/contact'
+    | '/'
+  fileRoutesByTo: FileRoutesByTo
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ApiContactRoute: typeof ApiContactRoute
-  ApiDownloadRoute: typeof ApiDownloadRoute
-  ChiSiamoRoute: typeof ChiSiamoRoute
-  ContattiRoute: typeof ContattiRoute
-  EnCookiePolicyRoute: typeof EnCookiePolicyRoute
-  EnPrivacyRoute: typeof EnPrivacyRoute
-  PrivacyContattiRoute: typeof PrivacyContattiRoute
-  ProgettiRoute: typeof ProgettiRoute
   ServiziRoute: typeof ServiziRoute
+  ProgettiRoute: typeof ProgettiRoute
+  PrivacyContattiRoute: typeof PrivacyContattiRoute
+  ContattiRoute: typeof ContattiRoute
+  ChiSiamoRoute: typeof ChiSiamoRoute
+  EnIndexRoute: typeof EnIndexRoute
+  EnServicesRoute: typeof EnServicesRoute
+  EnProjectsRoute: typeof EnProjectsRoute
+  EnAboutRoute: typeof EnAboutRoute
+  EnContactRoute: typeof EnContactRoute
+  EnContactPrivacyRoute: typeof EnContactPrivacyRoute
+  EnPrivacyRoute: typeof EnPrivacyRoute
+  EnCookiePolicyRoute: typeof EnCookiePolicyRoute
+  ApiDownloadRoute: typeof ApiDownloadRoute
+  ApiContactRoute: typeof ApiContactRoute
+  IndexRoute: typeof IndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -195,6 +272,48 @@ declare module '@tanstack/react-router' {
       path: '/chi-siamo'
       fullPath: '/chi-siamo'
       preLoaderRoute: typeof ChiSiamoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/': {
+      id: '/en/'
+      path: '/en/'
+      fullPath: '/en/'
+      preLoaderRoute: typeof EnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/services': {
+      id: '/en/services'
+      path: '/en/services'
+      fullPath: '/en/services'
+      preLoaderRoute: typeof EnServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/projects': {
+      id: '/en/projects'
+      path: '/en/projects'
+      fullPath: '/en/projects'
+      preLoaderRoute: typeof EnProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/about': {
+      id: '/en/about'
+      path: '/en/about'
+      fullPath: '/en/about'
+      preLoaderRoute: typeof EnAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/contact': {
+      id: '/en/contact'
+      path: '/en/contact'
+      fullPath: '/en/contact'
+      preLoaderRoute: typeof EnContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/contact-privacy': {
+      id: '/en/contact-privacy'
+      path: '/en/contact-privacy'
+      fullPath: '/en/contact-privacy'
+      preLoaderRoute: typeof EnContactPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/privacy': {
@@ -236,16 +355,22 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ApiContactRoute: ApiContactRoute,
-  ApiDownloadRoute: ApiDownloadRoute,
-  ChiSiamoRoute: ChiSiamoRoute,
-  ContattiRoute: ContattiRoute,
-  EnCookiePolicyRoute: EnCookiePolicyRoute,
-  EnPrivacyRoute: EnPrivacyRoute,
-  PrivacyContattiRoute: PrivacyContattiRoute,
-  ProgettiRoute: ProgettiRoute,
   ServiziRoute: ServiziRoute,
+  ProgettiRoute: ProgettiRoute,
+  PrivacyContattiRoute: PrivacyContattiRoute,
+  ContattiRoute: ContattiRoute,
+  ChiSiamoRoute: ChiSiamoRoute,
+  EnIndexRoute: EnIndexRoute,
+  EnServicesRoute: EnServicesRoute,
+  EnProjectsRoute: EnProjectsRoute,
+  EnAboutRoute: EnAboutRoute,
+  EnContactRoute: EnContactRoute,
+  EnContactPrivacyRoute: EnContactPrivacyRoute,
+  EnPrivacyRoute: EnPrivacyRoute,
+  EnCookiePolicyRoute: EnCookiePolicyRoute,
+  ApiDownloadRoute: ApiDownloadRoute,
+  ApiContactRoute: ApiContactRoute,
+  IndexRoute: IndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
