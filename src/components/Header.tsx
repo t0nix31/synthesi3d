@@ -70,23 +70,29 @@ export function Header() {
   const languageSwitch = getLanguageSwitch(location.pathname);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1800px] items-center justify-between px-4 py-3 sm:px-6 sm:py-4 lg:px-8 2xl:px-10">
+    <header className="fixed left-0 right-0 top-0 z-50 overflow-x-clip border-b border-border/60 bg-background/80 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between gap-3 px-3 py-3 sm:px-5 sm:py-4 lg:px-8 min-[1800px]:px-10">
         <Link
           to={homeLink}
-          className="group flex min-w-0 items-center"
+          className="group flex min-w-0 flex-1 items-center min-[1800px]:flex-none"
           onClick={() => setOpen(false)}
-          aria-label={isEnglish ? "Sintesi 3D — Home" : "Sintesi 3D — Home"}
+          aria-label="Sintesi 3D — Home"
         >
-          <Logo className="h-9 w-auto transition-smooth group-hover:drop-shadow-[0_0_12px_oklch(0.82_0.16_195/0.55)] sm:h-12 md:h-14 2xl:h-16" />
+          <Logo className="h-8 w-auto max-w-full transition-smooth group-hover:drop-shadow-[0_0_12px_oklch(0.82_0.16_195/0.55)] sm:h-10 md:h-11 lg:h-12 min-[1800px]:h-16" />
         </Link>
 
-        <nav className="hidden items-center gap-7 2xl:flex 2xl:gap-9">
+        {/*
+          The full desktop navigation is intentionally shown only on very wide
+          screens. At intermediate widths a normal desktop browser window may be
+          too narrow for logo + menu + language switch + quote button, so we use
+          the compact menu to avoid clipped buttons.
+        */}
+        <nav className="hidden min-[1800px]:flex items-center gap-8">
           {links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground transition-smooth hover:text-primary"
+              className="whitespace-nowrap font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground transition-smooth hover:text-primary"
               activeProps={{ className: "text-primary" }}
               activeOptions={{ exact: true }}
             >
@@ -95,11 +101,11 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 2xl:flex">
+        <div className="hidden min-[1800px]:flex shrink-0 items-center gap-3">
           <a
             href={languageSwitch.href}
             aria-label={languageSwitch.ariaLabel}
-            className="inline-flex items-center gap-2 border border-border px-3 py-2 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground transition-smooth hover:border-primary hover:text-primary"
+            className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border border-border px-3 py-2 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground transition-smooth hover:border-primary hover:text-primary"
           >
             <Globe2 className="h-3.5 w-3.5" />
             {languageSwitch.label}
@@ -107,25 +113,25 @@ export function Header() {
 
           <Link
             to={quoteLink}
-            className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 px-5 py-2.5 font-mono text-xs uppercase tracking-[0.2em] text-primary transition-smooth hover:bg-primary hover:text-primary-foreground hover:shadow-glow"
+            className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border border-primary/40 bg-primary/10 px-5 py-2.5 font-mono text-xs uppercase tracking-[0.2em] text-primary transition-smooth hover:bg-primary hover:text-primary-foreground hover:shadow-glow"
           >
             {quoteLabel}
             <span className="h-1 w-1 rounded-full bg-primary" />
           </Link>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 2xl:hidden">
+        <div className="flex shrink-0 items-center gap-2 min-[1800px]:hidden">
           <a
             href={languageSwitch.href}
             aria-label={languageSwitch.ariaLabel}
-            className="inline-flex items-center gap-1.5 border border-border px-2.5 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-smooth hover:border-primary hover:text-primary sm:text-xs"
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap border border-border px-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground transition-smooth hover:border-primary hover:text-primary sm:text-xs"
           >
             <Globe2 className="h-3.5 w-3.5" />
             {languageSwitch.label}
           </a>
 
           <button
-            className="inline-flex h-10 w-10 items-center justify-center text-foreground"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-foreground"
             onClick={() => setOpen(!open)}
             aria-label={isEnglish ? "Toggle menu" : "Apri menu"}
             aria-expanded={open}
@@ -136,7 +142,7 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-border/60 bg-background/95 backdrop-blur-xl 2xl:hidden">
+        <div className="border-t border-border/60 bg-background/95 backdrop-blur-xl min-[1800px]:hidden">
           <nav className="flex flex-col px-6 py-4">
             {links.map((l) => (
               <Link
