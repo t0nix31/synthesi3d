@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Layout } from "@/components/Layout";
-import { ArrowRight, Cpu, Globe2, Layers, Scan, Wrench } from "lucide-react";
+import { ArrowRight, Cpu, Layers, Scan, Wrench } from "lucide-react";
 import heroImg from "@/assets/hero-3dprint.jpg";
 import scanImg from "@/assets/service-scan.jpg";
 import printImg from "@/assets/service-print.jpg";
@@ -68,13 +68,6 @@ function HomePage() {
             <div className="flex flex-wrap items-center gap-3">
               <span className="h-px w-12 bg-primary" />
               <span className="tech-label">SYS · 001 — Engineering Studio</span>
-              <Link
-                to="/en/"
-                className="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-primary transition-smooth hover:bg-primary hover:text-primary-foreground"
-              >
-                <Globe2 className="h-3 w-3" />
-                English version
-              </Link>
             </div>
 
             <h1 className="mt-8 font-display text-5xl font-semibold leading-[0.95] tracking-tight md:text-7xl lg:text-[7.5rem]">
