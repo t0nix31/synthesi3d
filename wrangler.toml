@@ -4,7 +4,7 @@ name = "synthesi3d"
 compatibility_date = "2026-05-12"
 compatibility_flags = ["nodejs_compat"]
 
-main = "@tanstack/react-start/server-entry"
+main = "dist/server/server.js"
 
 [[r2_buckets]]
 binding = "CONTACT_UPLOADS"
