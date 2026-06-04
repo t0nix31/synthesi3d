@@ -21,6 +21,43 @@ type WorkerEnv = {
 const MAX_TOTAL_UPLOAD_MB = 95;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
 const DOWNLOAD_LINK_EXPIRES_SECONDS = 7 * 24 * 60 * 60;
+const MAX_FILES = 10;
+
+// Whitelist MIME types accettati lato server (non bypassabile dal client)
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "model/stl",
+  "application/octet-stream", // .stl/.step/.obj spesso arrivano come octet-stream
+  "application/sla",
+  "application/vnd.ms-pki.stl",
+  "application/x-zip-compressed",
+  "application/zip",
+  "application/x-rar-compressed",
+  "application/vnd.rar",
+]);
+
+// Whitelist estensioni (doppio controllo indipendente dal MIME)
+const ALLOWED_EXTENSIONS = new Set([
+  ".pdf", ".jpg", ".jpeg", ".png", ".webp", ".gif",
+  ".stl", ".step", ".stp", ".obj", ".zip", ".rar",
+]);
+
+// Limiti lunghezza campi testo
+const FIELD_LIMITS = {
+  name: 120,
+  email: 254,
+  company: 200,
+  phone: 30,
+  service: 100,
+  message: 5000,
+} as const;
+
+// Regex validazione email
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export const Route = createFileRoute("/api/contact")({
   server: {
@@ -54,11 +91,47 @@ export const Route = createFileRoute("/api/contact")({
             );
           }
 
+          // Validazione formato email
+          if (!EMAIL_REGEX.test(email)) {
+            return json({ success: false, message: "Indirizzo email non valido." }, 400);
+          }
+
+          // Limiti lunghezza campi
+          if (name.length > FIELD_LIMITS.name || email.length > FIELD_LIMITS.email ||
+              company.length > FIELD_LIMITS.company || phone.length > FIELD_LIMITS.phone ||
+              service.length > FIELD_LIMITS.service || message.length > FIELD_LIMITS.message) {
+            return json({ success: false, message: "Uno o più campi superano la lunghezza massima consentita." }, 400);
+          }
+
           const files = formData
             .getAll("files")
             .filter((value): value is File => value instanceof File && value.size > 0);
 
           const totalUploadSize = files.reduce((total, file) => total + file.size, 0);
+
+          // Limite numero di file
+          if (files.length > MAX_FILES) {
+            return json(
+              { success: false, message: `Puoi allegare massimo ${MAX_FILES} file per richiesta.` },
+              400,
+            );
+          }
+
+          // Validazione tipo file (MIME + estensione)
+          for (const file of files) {
+            const ext = "." + (file.name.split(".").pop() ?? "").toLowerCase();
+            const mime = (file.type || "application/octet-stream").toLowerCase().split(";")[0].trim();
+
+            if (!ALLOWED_EXTENSIONS.has(ext) || !ALLOWED_MIME_TYPES.has(mime)) {
+              return json(
+                {
+                  success: false,
+                  message: `Tipo di file non consentito: ${file.name}. Sono accettati PDF, immagini, STL, STEP, OBJ, ZIP e RAR.`,
+                },
+                415,
+              );
+            }
+          }
 
           if (totalUploadSize > MAX_TOTAL_UPLOAD_BYTES) {
             return json(
@@ -176,6 +249,9 @@ function json(data: unknown, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
     },
   });
 }
