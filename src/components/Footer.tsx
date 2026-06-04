@@ -122,7 +122,7 @@ export function Footer() {
               ) : (
                 <a
                   href="https://www.iubenda.com/privacy-policy/82947247"
-                  className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
+                  className={legalLinkClass}
                   title="Privacy Policy"
                 >
                   Privacy Policy
@@ -138,7 +138,7 @@ export function Footer() {
               ) : (
                 <a
                   href="https://www.iubenda.com/privacy-policy/82947247/cookie-policy"
-                  className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
+                  className={legalLinkClass}
                   title="Cookie Policy"
                 >
                   Cookie Policy
@@ -155,7 +155,11 @@ export function Footer() {
             <li>
               <button
                 type="button"
-                className={`iubenda-cs-preferences-link cursor-pointer bg-transparent p-0 text-left ${legalLinkClass}`}
+                className={`cursor-pointer bg-transparent p-0 text-left ${legalLinkClass}`}
+                onClick={() => {
+                  const fn = (window as unknown as Record<string, unknown>).openCookiePreferences;
+                  if (typeof fn === "function") (fn as () => void)();
+                }}
               >
                 {isEnglish ? "Cookie preferences" : "Preferenze cookie"}
               </button>
