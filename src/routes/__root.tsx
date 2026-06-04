@@ -46,6 +46,10 @@ export const Route = createRootRoute({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Sintesi 3D" },
+      // Security headers via meta tag (pagine HTML)
+      { httpEquiv: "X-Content-Type-Options", content: "nosniff" },
+      { httpEquiv: "X-Frame-Options", content: "DENY" },
+      { name: "referrer", content: "strict-origin-when-cross-origin" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
