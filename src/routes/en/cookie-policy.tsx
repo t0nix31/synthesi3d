@@ -61,13 +61,14 @@ function CookieNoticeEn() {
 
           <Block title="3. Cookie banner and consent management">
             <p>
-              The website uses iubenda Privacy Controls and Cookie Solution to show
-              the cookie banner and manage user preferences where required.
+              This website uses a built-in cookie consent banner to collect and manage user
+              preferences before any non-essential cookies are set.
             </p>
 
             <p className="mt-3">
-              Users can manage their preferences through the cookie banner or through
-              the available privacy controls provided by iubenda.
+              Users can accept all cookies, reject non-essential cookies, or manage their
+              preferences by category at any time via the &quot;Cookie preferences&quot; link in
+              the footer.
             </p>
           </Block>
 
@@ -88,7 +89,7 @@ function CookieNoticeEn() {
             <p className="mt-3">
               <a
                 href="https://www.iubenda.com/privacy-policy/82947247/cookie-policy"
-                className="iubenda-white iubenda-noiframe iubenda-embed text-primary underline underline-offset-4"
+                className="text-primary underline underline-offset-4"
                 title="Cookie Policy"
               >
                 Italian Cookie Policy
