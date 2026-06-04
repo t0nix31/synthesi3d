@@ -74,6 +74,7 @@
   src: url("/font/montserrat-v31-latin-700.woff2") format("woff2");
 }
 
+@import "./styles/cookie-consent.css";
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
