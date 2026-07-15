@@ -4,7 +4,14 @@ name = "synthesi3d"
 compatibility_date = "2026-05-12"
 compatibility_flags = ["nodejs_compat"]
 
-main = "@tanstack/react-start/server-entry"
+# Entry point SSR generato da `npm run build`.
+main = "dist/server/server.js"
+
+# Asset client generati da Vite.
+[assets]
+directory = "dist/client"
+binding = "ASSETS"
+run_worker_first = true
 
 [[r2_buckets]]
 binding = "CONTACT_UPLOADS"
@@ -12,4 +19,3 @@ bucket_name = "synthesi3d-contatti"
 
 [observability]
 enabled = true
-
