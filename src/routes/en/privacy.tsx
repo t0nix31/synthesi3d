@@ -221,7 +221,7 @@ function PrivacyNoticeEn() {
 
           <div className="border-t border-border/60 pt-10">
             <Link
-              to="/en/"
+              to="/en"
               className="font-mono text-xs uppercase tracking-[0.25em] text-primary transition-smooth hover:text-foreground"
             >
               ← Back to English website

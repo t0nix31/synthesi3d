@@ -218,6 +218,14 @@ function ProjectsPage() {
                     </div>
                   </div>
                 </div>
+                {p.code === "P-01" && (
+                  <Link
+                    to="/progetti/reverse-engineering-staffa-automotive"
+                    className="mt-6 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-primary"
+                  >
+                    Leggi il caso studio <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
               </div>
             </article>
           ))}

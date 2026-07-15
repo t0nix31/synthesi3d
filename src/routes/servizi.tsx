@@ -31,6 +31,7 @@ const services = [
     code: "01",
     icon: Layers,
     title: "Stampa 3D",
+    to: "/stampa-3d-professionale",
     img: printImg,
     desc: "Produciamo prototipi funzionali e pezzi finiti utilizzando le migliori tecnologie additive disponibili: FDM, SLA, SLS, MJF e SLM per i metalli.",
     features: [
@@ -45,6 +46,7 @@ const services = [
     code: "02",
     icon: Scan,
     title: "Scansione 3D",
+    to: "/scansione-3d",
     img: scanImg,
     desc: "Acquisizione 3D ad alta risoluzione di componenti, prototipi o oggetti d'arte con tecnologie a luce strutturata e laser. Il servizio può essere svolto presso i nostri studi oppure direttamente in sede del cliente.",
     features: [
@@ -58,6 +60,7 @@ const services = [
     code: "03",
     icon: Wrench,
     title: "Reverse Engineering",
+    to: "/reverse-engineering",
     img: reverseImg,
     desc: "Trasformiamo un componente fisico, anche obsoleto o senza disegni, in un modello CAD parametrico pronto per la produzione.",
     features: [
@@ -71,6 +74,7 @@ const services = [
     code: "04",
     icon: Cpu,
     title: "Progettazione CAD",
+    to: "/progettazione-cad",
     img: cadImg,
     desc: "Design ingegneristico completo: dal concept al disegno tecnico esecutivo, integrando know-how aerospace e motorsport.",
     features: [
@@ -125,6 +129,9 @@ function ServicesPage() {
                     </li>
                   ))}
                 </ul>
+                <Link to={s.to} className="mt-8 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-primary hover:gap-3">
+                  Scopri il servizio <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
 
               <div className="relative">

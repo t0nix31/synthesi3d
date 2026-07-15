@@ -2,11 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { Layout } from "@/components/Layout";
 
-import { Mail, Phone, Globe, MapPin, Send, Paperclip, X, FileText } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  Globe,
+  MapPin,
+  Send,
+  Paperclip,
+  X,
+  FileText,
+} from "lucide-react";
 
 import { useRef, useState, type FormEvent } from "react";
 
 import { toast } from "sonner";
+import { trackConversion } from "@/lib/analytics";
 
 const MAX_TOTAL_UPLOAD_MB = 95;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
@@ -23,7 +33,8 @@ export const Route = createFileRoute("/contatti")({
       { property: "og:title", content: "Contatti — Sintesi 3D" },
       {
         property: "og:description",
-        content: "Richiedi un preventivo o scopri come possiamo realizzare il tuo progetto.",
+        content:
+          "Richiedi un preventivo o scopri come possiamo realizzare il tuo progetto.",
       },
     ],
   }),
@@ -74,6 +85,7 @@ function ContactPage() {
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [totalSize, setTotalSize] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const formStartedRef = useRef(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -105,11 +117,16 @@ function ContactPage() {
       toast.success("Richiesta inviata", {
         description: "Ti risponderemo entro 24 ore.",
       });
+      trackConversion("contact_form_submit", {
+        service: String(formData.get("service") ?? ""),
+        has_attachment: fileNames.length > 0,
+      });
 
       form.reset();
       setFileNames([]);
       setTotalSize(0);
     } catch (error) {
+      trackConversion("contact_form_error");
       toast.error("Invio non riuscito", {
         description:
           error instanceof Error
@@ -160,8 +177,9 @@ function ContactPage() {
           </h1>
 
           <p className="mt-10 max-w-2xl text-lg text-muted-foreground">
-            Compila il form, allega un riferimento o descrivi a parole la tua idea.
-            Riceverai un riscontro tecnico ed economico entro 24 ore lavorative.
+            Compila il form, allega un riferimento o descrivi a parole la tua
+            idea. Riceverai un riscontro tecnico ed economico entro 24 ore
+            lavorative.
           </p>
         </div>
       </section>
@@ -178,7 +196,10 @@ function ContactPage() {
                   className="corner-frame border border-border/60 bg-surface/40 p-6 transition-smooth hover:border-primary/50"
                 >
                   <div className="flex items-center justify-between">
-                    <c.icon className="h-5 w-5 text-primary" strokeWidth={1.5} />
+                    <c.icon
+                      className="h-5 w-5 text-primary"
+                      strokeWidth={1.5}
+                    />
 
                     <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                       {c.code}
@@ -192,12 +213,24 @@ function ContactPage() {
                   {c.href ? (
                     <a
                       href={c.href}
+                      onClick={() =>
+                        trackConversion(
+                          c.code === "TEL"
+                            ? "phone_click"
+                            : c.code === "EML"
+                              ? "email_click"
+                              : "cta_click",
+                          { channel: c.code },
+                        )
+                      }
                       className="mt-1 block font-display text-lg font-semibold transition-smooth hover:text-primary"
                     >
                       {c.value}
                     </a>
                   ) : (
-                    <div className="mt-1 font-display text-lg font-semibold">{c.value}</div>
+                    <div className="mt-1 font-display text-lg font-semibold">
+                      {c.value}
+                    </div>
                   )}
                 </div>
               ))}
@@ -208,7 +241,9 @@ function ContactPage() {
                 // Response time
               </p>
 
-              <p className="mt-3 font-display text-2xl font-semibold">≤ 24 ore</p>
+              <p className="mt-3 font-display text-2xl font-semibold">
+                ≤ 24 ore
+              </p>
 
               <p className="mt-2 text-sm text-muted-foreground">
                 Lun – Ven, giorni lavorativi.
@@ -219,11 +254,22 @@ function ContactPage() {
           <div className="lg:col-span-8">
             <form
               onSubmit={handleSubmit}
+              onFocus={() => {
+                if (!formStartedRef.current) {
+                  formStartedRef.current = true;
+                  trackConversion("contact_form_start");
+                }
+              }}
               method="POST"
               encType="multipart/form-data"
               className="border border-border/60 bg-surface/40 p-8 md:p-12"
             >
-              <input type="text" name="botcheck" className="hidden" tabIndex={-1} />
+              <input
+                type="text"
+                name="botcheck"
+                className="hidden"
+                tabIndex={-1}
+              />
 
               <div className="grid gap-6 sm:grid-cols-2">
                 <Field label="Nome" name="name" required />
@@ -291,7 +337,10 @@ function ContactPage() {
                 </label>
 
                 <label className="mt-3 flex cursor-pointer flex-col items-center justify-center border border-dashed border-border bg-background/30 px-6 py-8 text-center transition-smooth hover:border-primary/60 hover:bg-primary/5">
-                  <Paperclip className="mb-3 h-6 w-6 text-primary" strokeWidth={1.5} />
+                  <Paperclip
+                    className="mb-3 h-6 w-6 text-primary"
+                    strokeWidth={1.5}
+                  />
 
                   <span className="font-display text-base font-semibold text-foreground">
                     Carica file di riferimento
@@ -336,7 +385,10 @@ function ContactPage() {
                           key={fileName}
                           className="flex items-center gap-3 border border-border/60 bg-background/30 px-4 py-3 font-mono text-xs text-muted-foreground"
                         >
-                          <Paperclip className="h-4 w-4 shrink-0 text-primary" strokeWidth={1.5} />
+                          <Paperclip
+                            className="h-4 w-4 shrink-0 text-primary"
+                            strokeWidth={1.5}
+                          />
 
                           <span className="truncate">{fileName}</span>
                         </div>
@@ -377,12 +429,14 @@ function ContactPage() {
                     href="/privacy-contatti"
                     className="text-primary underline underline-offset-4"
                   >
-                    informativa sul trattamento dei dati inviati tramite il modulo contatti
+                    informativa sul trattamento dei dati inviati tramite il
+                    modulo contatti
                   </a>
-                  . Sono consapevole che i dati inseriti e gli eventuali allegati saranno
-                  trattati esclusivamente per gestire la mia richiesta, predisporre un
-                  riscontro tecnico o commerciale e ricontattarmi. Gli allegati saranno
-                  accessibili tramite link temporaneo e conservati per massimo 30 giorni.
+                  . Sono consapevole che i dati inseriti e gli eventuali
+                  allegati saranno trattati esclusivamente per gestire la mia
+                  richiesta, predisporre un riscontro tecnico o commerciale e
+                  ricontattarmi. Gli allegati saranno accessibili tramite link
+                  temporaneo e conservati per massimo 30 giorni.
                 </span>
               </label>
 

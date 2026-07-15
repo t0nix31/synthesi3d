@@ -1,6 +1,14 @@
 import type { SVGProps } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Facebook, Globe, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import {
+  Facebook,
+  Globe,
+  Instagram,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react";
 
 import { Logo } from "@/components/Logo";
 
@@ -35,25 +43,27 @@ const socialLinks = [
   },
 ].filter((social) => social.href);
 
-const legalLinkClass = "text-muted-foreground transition-smooth hover:text-primary";
+const legalLinkClass =
+  "text-muted-foreground transition-smooth hover:text-primary";
 
 export function Footer() {
   const location = useLocation();
   const isEnglish = location.pathname.startsWith("/en");
 
   const navLinks = isEnglish
-    ? [
-        { to: "/en/", label: "Home" },
+    ? ([
+        { to: "/en", label: "Home" },
         { to: "/en/services", label: "Services" },
         { to: "/en/about", label: "About" },
         { to: "/en/contact", label: "Contact" },
-      ] as const
-    : [
+      ] as const)
+    : ([
         { to: "/", label: "Home" },
         { to: "/servizi", label: "Servizi" },
+        { to: "/reverse-engineering", label: "Reverse Engineering" },
         { to: "/chi-siamo", label: "Chi Siamo" },
         { to: "/contatti", label: "Contatti" },
-      ] as const;
+      ] as const);
 
   return (
     <footer className="relative mt-32 border-t border-border/60 bg-surface/40">
@@ -97,7 +107,9 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="tech-label mb-5">{isEnglish ? "Navigation" : "Navigazione"}</p>
+          <p className="tech-label mb-5">
+            {isEnglish ? "Navigation" : "Navigazione"}
+          </p>
 
           <ul className="space-y-3 text-sm">
             {navLinks.map((link) => (
@@ -122,7 +134,7 @@ export function Footer() {
               ) : (
                 <a
                   href="https://www.iubenda.com/privacy-policy/82947247"
-                  className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
+                  className={legalLinkClass}
                   title="Privacy Policy"
                 >
                   Privacy Policy
@@ -138,7 +150,7 @@ export function Footer() {
               ) : (
                 <a
                   href="https://www.iubenda.com/privacy-policy/82947247/cookie-policy"
-                  className={`iubenda-white iubenda-noiframe iubenda-embed ${legalLinkClass}`}
+                  className={legalLinkClass}
                   title="Cookie Policy"
                 >
                   Cookie Policy
@@ -147,15 +159,25 @@ export function Footer() {
             </li>
 
             <li>
-              <Link to={isEnglish ? "/en/contact-privacy" : "/privacy-contatti"} className={legalLinkClass}>
-                {isEnglish ? "Contact form privacy notice" : "Informativa contatti"}
+              <Link
+                to={isEnglish ? "/en/contact-privacy" : "/privacy-contatti"}
+                className={legalLinkClass}
+              >
+                {isEnglish
+                  ? "Contact form privacy notice"
+                  : "Informativa contatti"}
               </Link>
             </li>
 
             <li>
               <button
                 type="button"
-                className={`iubenda-cs-preferences-link cursor-pointer bg-transparent p-0 text-left ${legalLinkClass}`}
+                className={`cursor-pointer bg-transparent p-0 text-left ${legalLinkClass}`}
+                onClick={() => {
+                  const fn = (window as unknown as Record<string, unknown>)
+                    .openCookiePreferences;
+                  if (typeof fn === "function") (fn as () => void)();
+                }}
               >
                 {isEnglish ? "Cookie preferences" : "Preferenze cookie"}
               </button>
@@ -164,26 +186,37 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="tech-label mb-5">{isEnglish ? "Contact" : "Contatti"}</p>
+          <p className="tech-label mb-5">
+            {isEnglish ? "Contact" : "Contatti"}
+          </p>
 
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <Mail className="mt-0.5 h-4 w-4 text-primary" />
-              <a href="mailto:info@sintesi3d.it" className="transition-smooth hover:text-primary">
+              <a
+                href="mailto:info@sintesi3d.it"
+                className="transition-smooth hover:text-primary"
+              >
                 info@sintesi3d.it
               </a>
             </li>
 
             <li className="flex items-start gap-2">
               <Phone className="mt-0.5 h-4 w-4 text-primary" />
-              <a href="tel:+393755905212" className="transition-smooth hover:text-primary">
+              <a
+                href="tel:+393755905212"
+                className="transition-smooth hover:text-primary"
+              >
                 +39 375 590 5212
               </a>
             </li>
 
             <li className="flex items-start gap-2">
               <Globe className="mt-0.5 h-4 w-4 text-primary" />
-              <a href="https://www.sintesi3d.it" className="transition-smooth hover:text-primary">
+              <a
+                href="https://www.sintesi3d.it"
+                className="transition-smooth hover:text-primary"
+              >
                 www.sintesi3d.it
               </a>
             </li>
@@ -198,7 +231,9 @@ export function Footer() {
 
       <div className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground md:flex-row lg:px-10">
-          <span>© {new Date().getFullYear()} Sintesi 3D — All rights reserved</span>
+          <span>
+            © {new Date().getFullYear()} Sintesi 3D — All rights reserved
+          </span>
 
           <span className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />

@@ -58,8 +58,11 @@ export const Route = createFileRoute("/api/download")({
         return new Response(object.body, {
           headers: {
             "Content-Type": object.httpMetadata?.contentType || "application/octet-stream",
-            "Content-Disposition": `attachment; filename="${sanitizeDownloadName(originalName)}"`,
+            "Content-Disposition": buildContentDisposition(originalName),
             "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
           },
         });
       },
@@ -95,6 +98,14 @@ function safeEqual(a: string, b: string) {
   }
 
   return result === 0;
+}
+
+// Encoding RFC 5987 per Content-Disposition con nomi non-ASCII
+function buildContentDisposition(fileName: string): string {
+  const safe = fileName.replace(/[\\/:*?"<>|]/g, "-").replace(/[^\x20-\x7e]/g, "");
+  const encoded = encodeURIComponent(fileName);
+  // Usa entrambe le forme per massima compatibilità browser
+  return `attachment; filename="${safe}"; filename*=UTF-8''${encoded}`;
 }
 
 function sanitizeDownloadName(fileName: string) {

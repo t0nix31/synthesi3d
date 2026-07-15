@@ -46,6 +46,10 @@ export const Route = createRootRoute({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Sintesi 3D" },
+      // Security headers via meta tag (pagine HTML)
+      { httpEquiv: "X-Content-Type-Options", content: "nosniff" },
+      { httpEquiv: "X-Frame-Options", content: "DENY" },
+      { name: "referrer", content: "strict-origin-when-cross-origin" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -61,6 +65,29 @@ export const Route = createRootRoute({
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": ["LocalBusiness", "ProfessionalService"],
+    "@id": "https://www.sintesi3d.it/#business",
+    name: "Sintesi 3D",
+    url: "https://www.sintesi3d.it/",
+    email: "info@sintesi3d.it",
+    telephone: "+39 375 590 5212",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Via S. Croce 48",
+      postalCode: "83020",
+      addressLocality: "Sperone",
+      addressRegion: "AV",
+      addressCountry: "IT",
+    },
+    areaServed: { "@type": "Country", name: "Italia" },
+    sameAs: [
+      "https://www.instagram.com/sintesi3d",
+      "https://www.tiktok.com/@www.sintesi3d.it",
+    ],
+  };
+
   return (
     <html lang="it" suppressHydrationWarning>
       <head>
@@ -70,6 +97,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
               "document.documentElement.lang = location.pathname.startsWith('/en') ? 'en' : 'it';",
           }}
         />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
         <HeadContent />
       </head>
       <body>
