@@ -4,10 +4,8 @@ name = "synthesi3d"
 compatibility_date = "2026-05-12"
 compatibility_flags = ["nodejs_compat"]
 
-# Entry point SSR generato da `npm run build`.
 main = "dist/server/server.js"
 
-# Asset client generati da Vite.
 [assets]
 directory = "dist/client"
 binding = "ASSETS"

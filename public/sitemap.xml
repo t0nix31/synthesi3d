@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.sintesi3d.it/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.sintesi3d.it/servizi</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.sintesi3d.it/stampa-3d-professionale</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.sintesi3d.it/scansione-3d</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.sintesi3d.it/progettazione-cad</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.sintesi3d.it/reverse-engineering</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.sintesi3d.it/progetti</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.sintesi3d.it/progetti/reverse-engineering-staffa-automotive</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.sintesi3d.it/chi-siamo</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.sintesi3d.it/contatti</loc><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.sintesi3d.it/en/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.sintesi3d.it/en/services</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.sintesi3d.it/en/projects</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.sintesi3d.it/en/about</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.sintesi3d.it/en/contact</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+</urlset>
