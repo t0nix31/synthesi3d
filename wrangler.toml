@@ -1,0 +1,15 @@
+"$schema" = "node_modules/wrangler/config-schema.json"
+
+name = "synthesi3d"
+compatibility_date = "2026-05-12"
+compatibility_flags = ["nodejs_compat"]
+
+main = "@tanstack/react-start/server-entry"
+
+[[r2_buckets]]
+binding = "CONTACT_UPLOADS"
+bucket_name = "synthesi3d-contatti"
+
+[observability]
+enabled = true
+
