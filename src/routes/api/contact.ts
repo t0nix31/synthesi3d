@@ -1,422 +1,233 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { env } from "cloudflare:workers";
+import type { APIRoute } from "@tanstack/react-start";
 
-type ContactUploadsBucket = {
-  put: (
-    key: string,
-    body: ReadableStream | ArrayBuffer | string,
-    options?: {
-      httpMetadata?: { contentType?: string };
-      customMetadata?: Record<string, string>;
-    },
-  ) => Promise<unknown>;
-};
+const ALLOWED_EXTENSIONS = [
+  ".pdf",
+  ".stl",
+  ".step",
+  ".stp",
+  ".obj",
+  ".zip",
+  ".rar",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".webp",
+];
 
-type WorkerEnv = {
-  CONTACT_UPLOADS: ContactUploadsBucket;
-  RESEND_API_KEY: string;
-  DOWNLOAD_LINK_SECRET: string;
-};
+const MAX_TOTAL_SIZE = 95 * 1024 * 1024;
+const MAX_SINGLE_FILE = 50 * 1024 * 1024;
 
-const MAX_TOTAL_UPLOAD_MB = 95;
-const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
-const DOWNLOAD_LINK_EXPIRES_SECONDS = 7 * 24 * 60 * 60;
-const MAX_FILES = 10;
+function hasAllowedExtension(filename: string): boolean {
+  const dot = filename.lastIndexOf(".");
+  if (dot === -1) return false;
+  return ALLOWED_EXTENSIONS.includes(filename.substring(dot).toLowerCase());
+}
 
-// Whitelist MIME types accettati lato server (non bypassabile dal client)
-const ALLOWED_MIME_TYPES = new Set([
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "model/stl",
-  "application/octet-stream", // .stl/.step/.obj spesso arrivano come octet-stream
-  "application/sla",
-  "application/vnd.ms-pki.stl",
-  "application/x-zip-compressed",
-  "application/zip",
-  "application/x-rar-compressed",
-  "application/vnd.rar",
-]);
+function sanitize(str: string | null, maxLen: number): string {
+  if (!str) return "";
+  return str.replace(/<[^>]*>/g, "").trim().slice(0, maxLen);
+}
 
-// Whitelist estensioni (doppio controllo indipendente dal MIME)
-const ALLOWED_EXTENSIONS = new Set([
-  ".pdf", ".jpg", ".jpeg", ".png", ".webp", ".gif",
-  ".stl", ".step", ".stp", ".obj", ".zip", ".rar",
-]);
-
-// Limiti lunghezza campi testo
-const FIELD_LIMITS = {
-  name: 120,
-  email: 254,
-  company: 200,
-  phone: 30,
-  service: 100,
-  message: 5000,
-} as const;
-
-// Regex validazione email
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-export const Route = createFileRoute("/api/contact")({
-  server: {
-    handlers: {
-      POST: async ({ request }) => {
-        const workerEnv = env as unknown as WorkerEnv;
-
-        try {
-          const formData = await request.formData();
-
-          const botcheck = String(formData.get("botcheck") ?? "");
-          if (botcheck) {
-            return json({ success: true });
-          }
-
-          const name = cleanText(formData.get("name"));
-          const email = cleanText(formData.get("email"));
-          const company = cleanText(formData.get("company"));
-          const phone = cleanText(formData.get("phone"));
-          const service = cleanText(formData.get("service"));
-          const message = cleanText(formData.get("message"));
-          const privacy = cleanText(formData.get("privacy"));
-
-          if (!name || !email || !service || !message || privacy !== "accepted") {
-            return json(
-              {
-                success: false,
-                message: "Compila tutti i campi obbligatori e accetta la privacy.",
-              },
-              400,
-            );
-          }
-
-          // Validazione formato email
-          if (!EMAIL_REGEX.test(email)) {
-            return json({ success: false, message: "Indirizzo email non valido." }, 400);
-          }
-
-          // Limiti lunghezza campi
-          if (name.length > FIELD_LIMITS.name || email.length > FIELD_LIMITS.email ||
-              company.length > FIELD_LIMITS.company || phone.length > FIELD_LIMITS.phone ||
-              service.length > FIELD_LIMITS.service || message.length > FIELD_LIMITS.message) {
-            return json({ success: false, message: "Uno o più campi superano la lunghezza massima consentita." }, 400);
-          }
-
-          const files = formData
-            .getAll("files")
-            .filter((value): value is File => value instanceof File && value.size > 0);
-
-          const totalUploadSize = files.reduce((total, file) => total + file.size, 0);
-
-          // Limite numero di file
-          if (files.length > MAX_FILES) {
-            return json(
-              { success: false, message: `Puoi allegare massimo ${MAX_FILES} file per richiesta.` },
-              400,
-            );
-          }
-
-          // Validazione tipo file (MIME + estensione)
-          for (const file of files) {
-            const ext = "." + (file.name.split(".").pop() ?? "").toLowerCase();
-            const mime = (file.type || "application/octet-stream").toLowerCase().split(";")[0].trim();
-
-            if (!ALLOWED_EXTENSIONS.has(ext) || !ALLOWED_MIME_TYPES.has(mime)) {
-              return json(
-                {
-                  success: false,
-                  message: `Tipo di file non consentito: ${file.name}. Sono accettati PDF, immagini, STL, STEP, OBJ, ZIP e RAR.`,
-                },
-                415,
-              );
-            }
-          }
-
-          if (totalUploadSize > MAX_TOTAL_UPLOAD_BYTES) {
-            return json(
-              {
-                success: false,
-                message: `Gli allegati superano il limite di ${MAX_TOTAL_UPLOAD_MB} MB totali.`,
-              },
-              413,
-            );
-          }
-
-          const uploadedFiles = [];
-
-          for (const file of files) {
-            const safeName = sanitizeFileName(file.name);
-            const key = `contatti/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}-${safeName}`;
-
-            await workerEnv.CONTACT_UPLOADS.put(key, file.stream(), {
-              httpMetadata: {
-                contentType: file.type || "application/octet-stream",
-              },
-              customMetadata: {
-                originalName: file.name,
-                uploadedBy: email,
-                uploadedAt: new Date().toISOString(),
-              },
-            });
-
-            const downloadUrl = await createSignedDownloadUrl({
-              request,
-              key,
-              secret: workerEnv.DOWNLOAD_LINK_SECRET,
-            });
-
-            uploadedFiles.push({
-              name: file.name,
-              size: file.size,
-              url: downloadUrl,
-            });
-          }
-
-          const subject = `Nuova richiesta dal sito — ${service}`;
-          const text = buildTextEmail({
-            name,
-            email,
-            company,
-            phone,
-            service,
-            message,
-            uploadedFiles,
-          });
-
-          const html = buildHtmlEmail({
-            name,
-            email,
-            company,
-            phone,
-            service,
-            message,
-            uploadedFiles,
-          });
-
-          const resendResponse = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${workerEnv.RESEND_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              from: "Sintesi 3D <noreply@sintesi3d.it>",
-              to: ["info@sintesi3d.it"],
-              reply_to: email,
-              subject,
-              text,
-              html,
-            }),
-          });
-
-          if (!resendResponse.ok) {
-            const errorText = await resendResponse.text();
-
-            console.error("Resend error:", errorText);
-
-            return json(
-              {
-                success: false,
-                message: "Il messaggio non è stato inviato. Riprova tra qualche minuto.",
-              },
-              500,
-            );
-          }
-
-          return json({
-            success: true,
-            message: "Richiesta inviata correttamente.",
-          });
-        } catch (error) {
-          console.error("Contact form error:", error);
-
-          return json(
-            {
-              success: false,
-              message: "Errore durante l'invio. Riprova tra qualche minuto.",
-            },
-            500,
-          );
-        }
-      },
-    },
-  },
-});
-
-function json(data: unknown, status = 200) {
+function jsonResponse(data: unknown, status: number): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "X-Content-Type-Options": "nosniff",
-      "X-Frame-Options": "DENY",
-      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "https://www.sintesi3d.it",
     },
   });
 }
 
-function cleanText(value: FormDataEntryValue | null) {
-  if (typeof value !== "string") return "";
-  return value.trim();
-}
+export const POST: APIRoute = async ({ request, env }) => {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      headers: {
+        "Access-Control-Allow-Origin": "https://www.sintesi3d.it",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Max-Age": "86400",
+      },
+    });
+  }
 
-function sanitizeFileName(fileName: string) {
-  return fileName
-    .normalize("NFKD")
-    .replace(/[^\w.\-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 120);
-}
+  try {
+    const formData = await request.formData();
 
-async function createSignedDownloadUrl({
-  request,
-  key,
-  secret,
-}: {
-  request: Request;
-  key: string;
-  secret: string;
-}) {
-  const expires = Math.floor(Date.now() / 1000) + DOWNLOAD_LINK_EXPIRES_SECONDS;
-  const signature = await signDownloadLink(`${key}.${expires}`, secret);
+    const name = formData.get("name") as string | null;
+    const email = formData.get("email") as string | null;
+    const phone = formData.get("phone") as string | null;
+    const company = formData.get("company") as string | null;
+    const service = formData.get("service") as string | null;
+    const message = formData.get("message") as string | null;
+    const privacy = formData.get("privacy") as string | null;
+    const botcheck = formData.get("botcheck") as string | null;
+    const turnstileToken = formData.get("cf-turnstile-response") as string | null;
 
-  const url = new URL("/api/download", request.url);
-  url.searchParams.set("key", key);
-  url.searchParams.set("expires", String(expires));
-  url.searchParams.set("signature", signature);
+    if (botcheck) {
+      return jsonResponse({ success: true, message: "Sent." }, 200);
+    }
 
-  return url.toString();
-}
+    if (!turnstileToken) {
+      return jsonResponse(
+        { error: "Verifica anti-bot non completata. Riprova." },
+        403
+      );
+    }
 
-async function signDownloadLink(value: string, secret: string) {
-  const encoder = new TextEncoder();
+    const verifyRes = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secret: env.TURNSTILE_SECRET,
+          response: turnstileToken,
+          remoteip: request.headers.get("CF-Connecting-IP") ?? "",
+        }),
+      }
+    );
+    const verifyData = (await verifyRes.json()) as { success: boolean };
 
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
+    if (!verifyData.success) {
+      return jsonResponse(
+        { error: "Verifica anti-bot fallita. Riprova." },
+        403
+      );
+    }
 
-  const signature = await crypto.subtle.sign("HMAC", cryptoKey, encoder.encode(value));
+    const cleanName = sanitize(name, 100);
+    const cleanEmail = sanitize(email, 254);
+    const cleanPhone = sanitize(phone, 30);
+    const cleanCompany = sanitize(company, 150);
+    const cleanService = sanitize(service, 100);
+    const cleanMessage = sanitize(message, 5000);
 
-  return [...new Uint8Array(signature)]
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
+    if (!cleanName || !cleanEmail || !cleanMessage) {
+      return jsonResponse(
+        { error: "Nome, email e messaggio sono campi obbligatori." },
+        400
+      );
+    }
 
-function formatBytes(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return jsonResponse({ error: "Indirizzo email non valido." }, 400);
+    }
 
-function buildTextEmail({
-  name,
-  email,
-  company,
-  phone,
-  service,
-  message,
-  uploadedFiles,
-}: {
-  name: string;
-  email: string;
-  company: string;
-  phone: string;
-  service: string;
-  message: string;
-  uploadedFiles: Array<{ name: string; size: number; url: string }>;
-}) {
-  const filesText =
-    uploadedFiles.length > 0
-      ? uploadedFiles
-          .map(
-            (file, index) =>
-              `${index + 1}. ${file.name} (${formatBytes(file.size)})\n${file.url}`,
-          )
-          .join("\n\n")
-      : "Nessun allegato.";
+    if (privacy !== "accepted") {
+      return jsonResponse(
+        { error: "Accettazione della privacy obbligatoria." },
+        400
+      );
+    }
 
-  return `
-Nuova richiesta dal sito Sintesi 3D
+    const fileKeys: string[] = [];
+    const timestamp = Date.now();
 
-Nome: ${name}
-Email: ${email}
-Azienda: ${company || "-"}
-Telefono: ${phone || "-"}
-Servizio: ${service}
+    const files = formData.getAll("files") as (File | string)[];
+    const validFiles = files.filter(
+      (f): f is File => f instanceof File && f.size > 0
+    );
 
-Messaggio:
-${message}
+    if (validFiles.length > 0) {
+      const totalSize = validFiles.reduce((sum, f) => sum + f.size, 0);
+      if (totalSize > MAX_TOTAL_SIZE) {
+        return jsonResponse(
+          { error: "Dimensione totale dei file supera 95 MB." },
+          413
+        );
+      }
 
-Allegati:
-${filesText}
+      for (let i = 0; i < validFiles.length; i++) {
+        const file = validFiles[i];
 
-Nota: i link agli allegati scadono dopo 7 giorni.
-`.trim();
-}
+        if (!hasAllowedExtension(file.name)) {
+          return jsonResponse(
+            { error: `Tipo file non consentito: ${file.name}` },
+            400
+          );
+        }
 
-function buildHtmlEmail({
-  name,
-  email,
-  company,
-  phone,
-  service,
-  message,
-  uploadedFiles,
-}: {
-  name: string;
-  email: string;
-  company: string;
-  phone: string;
-  service: string;
-  message: string;
-  uploadedFiles: Array<{ name: string; size: number; url: string }>;
-}) {
-  const filesHtml =
-    uploadedFiles.length > 0
-      ? `<ul>${uploadedFiles
-          .map(
-            (file) =>
-              `<li><a href="${escapeHtml(file.url)}">${escapeHtml(file.name)}</a> — ${formatBytes(
-                file.size,
-              )}</li>`,
-          )
-          .join("")}</ul>`
-      : "<p>Nessun allegato.</p>";
+        if (file.size > MAX_SINGLE_FILE) {
+          return jsonResponse(
+            { error: `Il file "${file.name}" supera 50 MB.` },
+            413
+          );
+        }
 
-  return `
-<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
-  <h2>Nuova richiesta dal sito Sintesi 3D</h2>
+        const r2Key = `${timestamp}-${i}-${encodeURIComponent(file.name)}`;
 
-  <p><strong>Nome:</strong> ${escapeHtml(name)}</p>
-  <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-  <p><strong>Azienda:</strong> ${escapeHtml(company || "-")}</p>
-  <p><strong>Telefono:</strong> ${escapeHtml(phone || "-")}</p>
-  <p><strong>Servizio:</strong> ${escapeHtml(service)}</p>
+        await env.CONTACT_UPLOADS.put(r2Key, file, {
+          httpMetadata: {
+            contentType: "application/octet-stream",
+            contentDisposition: `attachment; filename="${encodeURIComponent(file.name)}"`,
+          },
+        });
 
-  <h3>Messaggio</h3>
-  <p>${escapeHtml(message).replace(/\n/g, "<br />")}</p>
+        fileKeys.push(r2Key);
+      }
+    }
 
-  <h3>Allegati</h3>
-  ${filesHtml}
+    const fileListHtml = fileKeys.length
+      ? `<hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb"/>
+         <h3 style="font-size:14px;font-weight:600;margin:0 0 8px">Allegati (${fileKeys.length})</h3>
+         <ul style="margin:0;padding-left:20px">
+           ${fileKeys
+             .map(
+               (key, idx) =>
+                 `<li style="margin:4px 0"><a href="https://www.sintesi3d.it/api/download?key=${encodeURIComponent(key)}" style="color:#2563eb">Allegato ${idx + 1}</a></li>`
+             )
+             .join("")}
+         </ul>`
+      : "";
 
-  <p style="font-size: 12px; color: #666;">
-    I link agli allegati scadono dopo 7 giorni.
-  </p>
-</div>
-`.trim();
-}
+    const emailHtml = `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1f2937">
+        <h2 style="font-size:18px;font-weight:700;margin:0 0 16px">📩 Nuova richiesta dal sito</h2>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+          <tr><td style="padding:6px 0;font-weight:600;width:120px">Nome</td><td style="padding:6px 0">${cleanName}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:600">Email</td><td style="padding:6px 0">${cleanEmail}</td></tr>
+          ${cleanPhone ? `<tr><td style="padding:6px 0;font-weight:600">Telefono</td><td style="padding:6px 0">${cleanPhone}</td></tr>` : ""}
+          ${cleanCompany ? `<tr><td style="padding:6px 0;font-weight:600">Azienda</td><td style="padding:6px 0">${cleanCompany}</td></tr>` : ""}
+          <tr><td style="padding:6px 0;font-weight:600">Servizio</td><td style="padding:6px 0">${cleanService || "—"}</td></tr>
+        </table>
+        <div style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:16px;white-space:pre-wrap">${cleanMessage}</div>
+        ${fileListHtml}
+        <p style="font-size:12px;color:#9ca3af;margin-top:24px">Ricevuto via sintesi3d.it · ${new Date().toLocaleString("it-IT")}</p>
+      </div>
+    `;
 
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+    const emailRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Sintesi 3D <sintesi3d@sintesi3d.it>",
+        to: "info@sintesi3d.it",
+        subject: `Nuova richiesta: ${cleanName} — ${cleanService || "Contatto"}`,
+        html: emailHtml,
+      }),
+    });
+
+    if (!emailRes.ok) {
+      const errText = await emailRes.text();
+      console.error("[ContactForm] Resend error:", emailRes.status, errText);
+    }
+
+    return jsonResponse(
+      {
+        success: true,
+        message: "Richiesta inviata. Risponderemo entro 24h lavorative.",
+      },
+      200
+    );
+  } catch (err) {
+    console.error("[ContactForm] Unhandled error:", err);
+    return jsonResponse(
+      { error: "Errore interno. Riprova tra qualche minuto." },
+      500
+    );
+  }
+};

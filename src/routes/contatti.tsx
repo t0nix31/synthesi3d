@@ -17,6 +17,7 @@ import { useRef, useState, type FormEvent } from "react";
 
 import { toast } from "sonner";
 import { trackConversion } from "@/lib/analytics";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 const MAX_TOTAL_UPLOAD_MB = 95;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
@@ -84,11 +85,19 @@ function ContactPage() {
   const [sending, setSending] = useState(false);
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [totalSize, setTotalSize] = useState(0);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const formStartedRef = useRef(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      toast.error("Verifica anti-bot", {
+        description: "Completa la verifica (checkbox Cloudflare) prima di inviare.",
+      });
+      return;
+    }
 
     if (totalSize > MAX_TOTAL_UPLOAD_BYTES) {
       toast.error("Allegati troppo grandi", {
@@ -99,6 +108,7 @@ function ContactPage() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+    formData.append("cf-turnstile-response", turnstileToken);
 
     setSending(true);
 
@@ -111,7 +121,10 @@ function ContactPage() {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.message || "Invio non riuscito.");
+        if (response.status === 403) {
+          setTurnstileToken("");
+        }
+        throw new Error(result.error || result.message || "Invio non riuscito.");
       }
 
       toast.success("Richiesta inviata", {
@@ -125,6 +138,7 @@ function ContactPage() {
       form.reset();
       setFileNames([]);
       setTotalSize(0);
+      setTurnstileToken("");
     } catch (error) {
       trackConversion("contact_form_error");
       toast.error("Invio non riuscito", {
@@ -133,6 +147,7 @@ function ContactPage() {
             ? error.message
             : "Si è verificato un errore. Riprova tra qualche minuto.",
       });
+      setTurnstileToken("");
     } finally {
       setSending(false);
     }
@@ -439,6 +454,11 @@ function ContactPage() {
                   temporaneo e conservati per massimo 30 giorni.
                 </span>
               </label>
+
+              <TurnstileWidget
+                onToken={setTurnstileToken}
+                className="mt-8"
+              />
 
               <button
                 type="submit"

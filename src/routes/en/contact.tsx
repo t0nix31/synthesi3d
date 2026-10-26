@@ -7,6 +7,7 @@ import { Mail, Phone, Globe, MapPin, Send, Paperclip, X, FileText } from "lucide
 import { useRef, useState, type FormEvent } from "react";
 
 import { toast } from "sonner";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 const MAX_TOTAL_UPLOAD_MB = 95;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
@@ -79,10 +80,18 @@ function ContactPageEn() {
   const [sending, setSending] = useState(false);
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [totalSize, setTotalSize] = useState(0);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      toast.error("Anti-bot check", {
+        description: "Complete the Cloudflare verification before submitting.",
+      });
+      return;
+    }
 
     if (totalSize > MAX_TOTAL_UPLOAD_BYTES) {
       toast.error("Attachments too large", {
@@ -93,6 +102,7 @@ function ContactPageEn() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+    formData.append("cf-turnstile-response", turnstileToken);
 
     setSending(true);
 
@@ -102,14 +112,17 @@ function ContactPageEn() {
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error("The message could not be sent. Please try again in a few minutes.");
-      }
-
       const result = await response.json();
 
-      if (!result.success) {
-        throw new Error("The message could not be sent. Please check the required fields and try again.");
+      if (!response.ok || !result.success) {
+        if (response.status === 403) {
+          setTurnstileToken("");
+        }
+        throw new Error(
+          result.error ||
+            result.message ||
+            "The message could not be sent. Please try again."
+        );
       }
 
       toast.success("Request sent", {
@@ -119,6 +132,7 @@ function ContactPageEn() {
       form.reset();
       setFileNames([]);
       setTotalSize(0);
+      setTurnstileToken("");
     } catch (error) {
       toast.error("Message not sent", {
         description:
@@ -126,6 +140,7 @@ function ContactPageEn() {
             ? error.message
             : "An error occurred. Please try again in a few minutes.",
       });
+      setTurnstileToken("");
     } finally {
       setSending(false);
     }
@@ -366,21 +381,21 @@ function ContactPageEn() {
                 />
 
                 <span>
-                  I have read the {" "}
+                  I have read the{" "}
                   <a
                     href="/en/privacy"
                     className="text-primary underline underline-offset-4"
                   >
                     Privacy Notice
                   </a>
-                  , the {" "}
+                  , the{" "}
                   <a
                     href="/en/cookie-policy"
                     className="text-primary underline underline-offset-4"
                   >
                     Cookie Notice
                   </a>{" "}
-                  and the {" "}
+                  and the{" "}
                   <a
                     href="/en/contact-privacy"
                     className="text-primary underline underline-offset-4"
@@ -393,6 +408,11 @@ function ContactPageEn() {
                   temporary links and kept for a maximum of 30 days.
                 </span>
               </label>
+
+              <TurnstileWidget
+                onToken={setTurnstileToken}
+                className="mt-8"
+              />
 
               <button
                 type="submit"

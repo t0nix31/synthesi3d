@@ -16,3 +16,4 @@ bucket_name = "synthesi3d-contatti"
 
 [observability]
 enabled = true
+log_level = "info"
