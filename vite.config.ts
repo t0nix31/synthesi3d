@@ -10,6 +10,7 @@ export default defineConfig({
   vite: {
     base: "/",
     build: {
+      ssr: "src/entry-server.tsx",
       rollupOptions: {
         // Cloudflare Workers built-ins — risolti a runtime dal Worker, non da Rollup
         external: ["cloudflare:workers"],
