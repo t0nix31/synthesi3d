@@ -10,7 +10,6 @@ export default defineConfig({
   vite: {
     base: "/",
     build: {
-      ssr: "src/entry-server.tsx",
       rollupOptions: {
         external: ["cloudflare:workers"],
       },
